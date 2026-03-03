@@ -4,11 +4,19 @@ from typing import Any
 
 import voluptuous as vol
 from homeassistant.config_entries import SOURCE_RECONFIGURE, ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
-from homeassistant.const import CONF_BAUDRATE, CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT
+from homeassistant.const import CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT
 from homeassistant.core import callback
 from homeassistant.helpers.selector import TextSelector, TextSelectorConfig, TextSelectorType
 
-from .const import CONF_DEBUG, CONF_SERIAL_COMMUNICATION_LOGGING, DEFAULT_BAUDRATE, DEFAULT_SCAN_INTERVAL, DEFAULT_TIMEOUT, DOMAIN
+from .const import (
+    CONF_BAUDRATE,
+    CONF_DEBUG,
+    CONF_SERIAL_COMMUNICATION_LOGGING,
+    DEFAULT_BAUDRATE,
+    DEFAULT_SCAN_INTERVAL,
+    DEFAULT_TIMEOUT,
+    DOMAIN,
+)
 from .pykamstrup.kamstrup import Kamstrup
 
 CONFIG_SCHEMA = vol.Schema(

@@ -4,13 +4,13 @@ import logging
 from unittest.mock import AsyncMock, Mock, call, patch
 
 import pytest
-from homeassistant.const import CONF_BAUDRATE, CONF_PORT
+from homeassistant.const import CONF_PORT
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.kamstrup_403 import async_setup_entry
-from custom_components.kamstrup_403.const import CONF_DEBUG, DOMAIN
+from custom_components.kamstrup_403.const import CONF_BAUDRATE, CONF_DEBUG, DOMAIN
 from custom_components.kamstrup_403.coordinator import KamstrupUpdateCoordinator
 
 from . import get_mock_config_entry, setup_integration, unload_integration

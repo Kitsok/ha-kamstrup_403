@@ -15,4 +15,5 @@ DEFAULT_BAUDRATE: Final = 1200
 DEFAULT_SCAN_INTERVAL: Final = 3600
 DEFAULT_TIMEOUT: Final = 1.0
 CONF_DEBUG: Final = "debug"
+CONF_BAUDRATE: Final = "baudrate"
 CONF_SERIAL_COMMUNICATION_LOGGING: Final = "serial_communication_logging"

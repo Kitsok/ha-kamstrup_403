@@ -8,11 +8,19 @@ import logging
 from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.const import CONF_BAUDRATE, CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT, Platform
+from homeassistant.const import CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
-from .const import CONF_DEBUG, CONF_SERIAL_COMMUNICATION_LOGGING, DEFAULT_BAUDRATE, DEFAULT_SCAN_INTERVAL, DEFAULT_TIMEOUT, DOMAIN
+from .const import (
+    CONF_BAUDRATE,
+    CONF_DEBUG,
+    CONF_SERIAL_COMMUNICATION_LOGGING,
+    DEFAULT_BAUDRATE,
+    DEFAULT_SCAN_INTERVAL,
+    DEFAULT_TIMEOUT,
+    DOMAIN,
+)
 from .coordinator import KamstrupUpdateCoordinator
 from .pykamstrup.kamstrup import Kamstrup
 
