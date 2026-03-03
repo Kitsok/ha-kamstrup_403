@@ -25,11 +25,19 @@ class Kamstrup:
     reader: asyncio.StreamReader | None
     writer: asyncio.StreamWriter | None
 
-    def __init__(self, url: str, baudrate: int, timeout: float, serial_communication_logging: bool = False) -> None:
+    def __init__(
+        self,
+        url: str,
+        baudrate: int,
+        timeout: float,
+        stopbits: float = 1.0,
+        serial_communication_logging: bool = False,
+    ) -> None:
         """Initialize."""
         self.url = url
         self.baudrate = baudrate
         self.timeout = timeout
+        self.stopbits = stopbits
         self.serial_communication_logging = serial_communication_logging
         self.reader = None
         self.writer = None
@@ -37,7 +45,11 @@ class Kamstrup:
     async def connect(self) -> None:
         """Connect to the serial device."""
         if self.reader is None or self.writer is None:
-            self.reader, self.writer = await serial_asyncio.open_serial_connection(url=self.url, baudrate=self.baudrate)
+            self.reader, self.writer = await serial_asyncio.open_serial_connection(
+                url=self.url,
+                baudrate=self.baudrate,
+                stopbits=self.stopbits,
+            )
 
     async def disconnect(self) -> None:
         """Disconnect from the serial device."""

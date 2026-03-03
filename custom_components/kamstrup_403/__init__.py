@@ -16,8 +16,10 @@ from .const import (
     CONF_BAUDRATE,
     CONF_DEBUG,
     CONF_SERIAL_COMMUNICATION_LOGGING,
+    CONF_STOPBITS,
     DEFAULT_BAUDRATE,
     DEFAULT_SCAN_INTERVAL,
+    DEFAULT_STOPBITS,
     DEFAULT_TIMEOUT,
     DOMAIN,
 )
@@ -48,6 +50,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry[Kamst
     scan_interval = timedelta(seconds=scan_interval_seconds)
     timeout_seconds = config_entry.options.get(CONF_TIMEOUT, DEFAULT_TIMEOUT)
     baudrate = config_entry.options.get(CONF_BAUDRATE, DEFAULT_BAUDRATE)
+    stopbits = config_entry.options.get(CONF_STOPBITS, DEFAULT_STOPBITS)
     debug_enabled = config_entry.options.get(CONF_DEBUG, False)
     serial_communication_logging = config_entry.options.get(CONF_SERIAL_COMMUNICATION_LOGGING, False)
 
@@ -58,10 +61,11 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry[Kamst
         raise ValueError(msg)
 
     _LOGGER.debug(
-        "Set up entry, with scan_interval %s, timeout %s, baudrate %s (debug=%s)",
+        "Set up entry, with scan_interval %s, timeout %s, baudrate %s, stopbits %s (debug=%s)",
         scan_interval_seconds,
         timeout_seconds,
         baudrate,
+        stopbits,
         debug_enabled,
     )
 
@@ -69,6 +73,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry[Kamst
         client = Kamstrup(
             url=port,
             baudrate=baudrate,
+            stopbits=stopbits,
             timeout=timeout_seconds,
             serial_communication_logging=serial_communication_logging,
         )

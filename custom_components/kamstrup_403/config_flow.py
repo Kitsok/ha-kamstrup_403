@@ -12,8 +12,10 @@ from .const import (
     CONF_BAUDRATE,
     CONF_DEBUG,
     CONF_SERIAL_COMMUNICATION_LOGGING,
+    CONF_STOPBITS,
     DEFAULT_BAUDRATE,
     DEFAULT_SCAN_INTERVAL,
+    DEFAULT_STOPBITS,
     DEFAULT_TIMEOUT,
     DOMAIN,
 )
@@ -95,6 +97,10 @@ class KamstrupOptionsFlowHandler(OptionsFlow):
                         CONF_BAUDRATE,
                         default=self.config_entry.options.get(CONF_BAUDRATE, DEFAULT_BAUDRATE),
                     ): vol.All(vol.Coerce(int), vol.Range(min=300, max=115200)),
+                    vol.Required(
+                        CONF_STOPBITS,
+                        default=self.config_entry.options.get(CONF_STOPBITS, DEFAULT_STOPBITS),
+                    ): vol.All(vol.Coerce(float), vol.In([1.0, 1.5, 2.0])),
                     vol.Required(
                         CONF_DEBUG,
                         default=self.config_entry.options.get(CONF_DEBUG, False),

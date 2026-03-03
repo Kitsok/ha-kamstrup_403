@@ -1,6 +1,6 @@
 [project]
 name = "ha-kamstrup_403-kitsok-fork"
-version = "0.0.4"
+version = "0.0.5"
 description = "Custom component that integrates the Kamstrup 403 heating system into Home Assistant (Kitsok Fork). This component does also support a few other heating systems"
 authors = [{ name = "Sander Gols", email = "developer@golles.nl" }]
 requires-python = ">=3.14.2,<3.15"

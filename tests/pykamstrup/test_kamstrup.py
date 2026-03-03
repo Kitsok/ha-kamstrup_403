@@ -15,6 +15,7 @@ def test_init() -> None:
     assert kamstrup.url == "test_url"
     assert kamstrup.baudrate == 9600
     assert kamstrup.timeout == 1.0
+    assert kamstrup.stopbits == 1.0
     assert kamstrup.serial_communication_logging is False
     assert kamstrup.reader is None
     assert kamstrup.writer is None
@@ -66,7 +67,22 @@ async def test_connect() -> None:
         kamstrup = Kamstrup("test_url", 9600, 1.0)
         await kamstrup.connect()
 
-        mock_open.assert_called_once_with(url="test_url", baudrate=9600)
+        mock_open.assert_called_once_with(url="test_url", baudrate=9600, stopbits=1.0)
+        assert kamstrup.reader == mock_reader
+        assert kamstrup.writer == mock_writer
+
+
+async def test_connect_with_custom_stopbits() -> None:
+    """Test connection method with custom stop bits."""
+    with patch("custom_components.kamstrup_403.pykamstrup.kamstrup.serial_asyncio.open_serial_connection") as mock_open:
+        mock_reader = AsyncMock()
+        mock_writer = AsyncMock()
+        mock_open.return_value = (mock_reader, mock_writer)
+
+        kamstrup = Kamstrup("test_url", 9600, 1.0, stopbits=2.0)
+        await kamstrup.connect()
+
+        mock_open.assert_called_once_with(url="test_url", baudrate=9600, stopbits=2.0)
         assert kamstrup.reader == mock_reader
         assert kamstrup.writer == mock_writer
 
@@ -154,7 +170,7 @@ async def test_ensure_connected_missing_reader() -> None:
 
         await kamstrup._ensure_connected()  # pylint: disable=protected-access
 
-        mock_open.assert_called_once_with(url="test_url", baudrate=9600)
+        mock_open.assert_called_once_with(url="test_url", baudrate=9600, stopbits=1.0)
         assert kamstrup.reader == mock_reader
         assert kamstrup.writer == mock_writer
 
@@ -172,7 +188,7 @@ async def test_ensure_connected_missing_writer() -> None:
 
         await kamstrup._ensure_connected()  # pylint: disable=protected-access
 
-        mock_open.assert_called_once_with(url="test_url", baudrate=9600)
+        mock_open.assert_called_once_with(url="test_url", baudrate=9600, stopbits=1.0)
         assert kamstrup.reader == mock_reader
         assert kamstrup.writer == mock_writer
 

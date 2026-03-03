@@ -12,8 +12,10 @@ MANUFACTURER: Final = "Kamstrup"
 # Keep sensor name prefix stable for backward-compatible entity IDs.
 DEFAULT_NAME: Final = "Kamstrup 403"
 DEFAULT_BAUDRATE: Final = 1200
+DEFAULT_STOPBITS: Final = 1.0
 DEFAULT_SCAN_INTERVAL: Final = 3600
 DEFAULT_TIMEOUT: Final = 1.0
 CONF_DEBUG: Final = "debug"
 CONF_BAUDRATE: Final = "baudrate"
+CONF_STOPBITS: Final = "stopbits"
 CONF_SERIAL_COMMUNICATION_LOGGING: Final = "serial_communication_logging"

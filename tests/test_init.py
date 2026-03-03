@@ -10,7 +10,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.kamstrup_403 import async_setup_entry
-from custom_components.kamstrup_403.const import CONF_BAUDRATE, CONF_DEBUG, DOMAIN
+from custom_components.kamstrup_403.const import CONF_BAUDRATE, CONF_DEBUG, CONF_STOPBITS, DOMAIN
 from custom_components.kamstrup_403.coordinator import KamstrupUpdateCoordinator
 
 from . import get_mock_config_entry, setup_integration, unload_integration
@@ -97,7 +97,7 @@ async def test_setup_entry_uses_configured_baudrate(hass: HomeAssistant) -> None
         domain=DOMAIN,
         entry_id="test_entry_baudrate",
         data={CONF_PORT: "/dev/ttyUSB0"},
-        options={CONF_BAUDRATE: 2400},
+        options={CONF_BAUDRATE: 2400, CONF_STOPBITS: 2.0},
     )
     config_entry.add_to_hass(hass)
 
@@ -119,6 +119,7 @@ async def test_setup_entry_uses_configured_baudrate(hass: HomeAssistant) -> None
     mock_kamstrup.assert_called_once_with(
         url="/dev/ttyUSB0",
         baudrate=2400,
+        stopbits=2.0,
         timeout=1.0,
         serial_communication_logging=False,
     )
