@@ -18,7 +18,8 @@
       "init": {
         "data": {
           "scan_interval": "Scan interval (seconds)",
-          "timeout": "Serial read timeout (seconds)"
+          "timeout": "Serial read timeout (seconds)",
+          "debug": "Enable debug logging"
         }
       }
     }

@@ -8,7 +8,7 @@ from homeassistant.const import CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT
 from homeassistant.core import callback
 from homeassistant.helpers.selector import TextSelector, TextSelectorConfig, TextSelectorType
 
-from .const import DEFAULT_BAUDRATE, DEFAULT_SCAN_INTERVAL, DEFAULT_TIMEOUT, DOMAIN
+from .const import CONF_DEBUG, DEFAULT_BAUDRATE, DEFAULT_SCAN_INTERVAL, DEFAULT_TIMEOUT, DOMAIN
 from .pykamstrup.kamstrup import Kamstrup
 
 CONFIG_SCHEMA = vol.Schema(
@@ -83,6 +83,10 @@ class KamstrupOptionsFlowHandler(OptionsFlow):
                         CONF_TIMEOUT,
                         default=self.config_entry.options.get(CONF_TIMEOUT, DEFAULT_TIMEOUT),
                     ): vol.All(vol.Coerce(float), vol.Range(min=0.0, max=5.0)),
+                    vol.Required(
+                        CONF_DEBUG,
+                        default=self.config_entry.options.get(CONF_DEBUG, False),
+                    ): bool,
                 }
             ),
         )

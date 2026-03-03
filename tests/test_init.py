@@ -1,14 +1,16 @@
 """Test setup."""
 
-from unittest.mock import patch
+import logging
+from unittest.mock import Mock, call, patch
 
 import pytest
+from homeassistant.const import CONF_PORT
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.kamstrup_403 import async_setup_entry
-from custom_components.kamstrup_403.const import DOMAIN
+from custom_components.kamstrup_403.const import CONF_DEBUG, DOMAIN
 from custom_components.kamstrup_403.coordinator import KamstrupUpdateCoordinator
 
 from . import get_mock_config_entry, setup_integration, unload_integration
@@ -62,3 +64,28 @@ async def test_async_reload_entry(hass: HomeAssistant) -> None:
         assert len(mock_reload_entry.mock_calls) == 0
         hass.config_entries.async_update_entry(config_entry, options={"something": "else"})
         assert len(mock_reload_entry.mock_calls) == 1
+
+
+async def test_setup_entry_enables_debug_logging(hass: HomeAssistant) -> None:
+    """Test setup entry applies debug logger levels."""
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        entry_id="test_entry_debug",
+        data={CONF_PORT: "/dev/ttyUSB0"},
+        options={CONF_DEBUG: True},
+    )
+    config_entry.add_to_hass(hass)
+
+    integration_logger = Mock()
+    pykamstrup_logger = Mock()
+    with patch("custom_components.kamstrup_403.logging.getLogger") as mock_get_logger:
+        mock_get_logger.side_effect = [integration_logger, pykamstrup_logger]
+        assert await hass.config_entries.async_setup(config_entry.entry_id)
+        await hass.async_block_till_done()
+
+    assert mock_get_logger.call_args_list == [
+        call("custom_components.kamstrup_403"),
+        call("custom_components.kamstrup_403.pykamstrup"),
+    ]
+    integration_logger.setLevel.assert_called_once_with(logging.DEBUG)
+    pykamstrup_logger.setLevel.assert_called_once_with(logging.DEBUG)

@@ -12,7 +12,7 @@ from homeassistant.const import CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT, Pla
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
-from .const import DEFAULT_BAUDRATE, DEFAULT_SCAN_INTERVAL, DEFAULT_TIMEOUT, DOMAIN
+from .const import CONF_DEBUG, DEFAULT_BAUDRATE, DEFAULT_SCAN_INTERVAL, DEFAULT_TIMEOUT, DOMAIN
 from .coordinator import KamstrupUpdateCoordinator
 from .pykamstrup.kamstrup import Kamstrup
 
@@ -24,6 +24,13 @@ PLATFORMS: list[Platform] = [
 ]
 
 
+def _set_debug_logging(enabled: bool) -> None:
+    """Set integration logging level from config entry options."""
+    level = logging.DEBUG if enabled else logging.NOTSET
+    logging.getLogger("custom_components.kamstrup_403").setLevel(level)
+    logging.getLogger("custom_components.kamstrup_403.pykamstrup").setLevel(level)
+
+
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry[KamstrupUpdateCoordinator]) -> bool:
     """Set up this integration using UI."""
     hass.data.setdefault(DOMAIN, {})
@@ -32,15 +39,19 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry[Kamst
     scan_interval_seconds = config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
     scan_interval = timedelta(seconds=scan_interval_seconds)
     timeout_seconds = config_entry.options.get(CONF_TIMEOUT, DEFAULT_TIMEOUT)
+    debug_enabled = config_entry.options.get(CONF_DEBUG, False)
+
+    _set_debug_logging(debug_enabled)
 
     if not port:
         msg = "Missing required configuration options: port."
         raise ValueError(msg)
 
     _LOGGER.debug(
-        "Set up entry, with scan_interval of %s seconds and timeout of %s seconds",
+        "Set up entry, with scan_interval of %s seconds and timeout of %s seconds (debug=%s)",
         scan_interval_seconds,
         timeout_seconds,
+        debug_enabled,
     )
 
     try:
