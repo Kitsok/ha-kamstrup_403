@@ -1,4 +1,4 @@
-# Kamstrup 403
+# Kamstrup 403 Kitsok Fork
 
 [![GitHub Release][releases-shield]][releases]
 [![GitHub Repo stars][stars-shield]][stars]
@@ -10,7 +10,7 @@
 [![Project Maintenance][maintenance-shield]][maintainer]
 [![BuyMeCoffee][buymecoffeebadge]][buymecoffee]
 
-Kamstrup 403 custom component for Home Assistant.
+Kamstrup 403 Kitsok Fork custom component for Home Assistant.
 
 <img width="660" alt="info" src="https://user-images.githubusercontent.com/2211503/200671065-201f84bc-0d01-4a87-8fd9-3da3beedfb5d.png">
 
@@ -51,7 +51,7 @@ This component can easily be installed in your Home Assistant using HACS.
 4. Download _all_ the files from the `custom_components/kamstrup_403/` directory (folder) in this repository.
 5. Place the files you downloaded in the new directory (folder) you created.
 6. Restart Home Assistant
-7. In the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Kamstrup 403"
+7. In the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Kamstrup 403 Kitsok Fork"
 
 Using your HA configuration directory (folder) as a starting point you should now also have these files:
 

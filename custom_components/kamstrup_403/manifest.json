@@ -1,6 +1,6 @@
 {
   "domain": "kamstrup_403",
-  "name": "Kamstrup 403",
+  "name": "Kamstrup 403 Kitsok Fork",
   "codeowners": ["@golles"],
   "config_flow": true,
   "documentation": "https://github.com/golles/ha-kamstrup_403/blob/main/README.md",

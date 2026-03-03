@@ -1,4 +1,4 @@
-"""Config flow for Kamstrup 403 integration."""
+"""Config flow for Kamstrup 403 Kitsok Fork integration."""
 
 from typing import Any
 
@@ -19,7 +19,7 @@ CONFIG_SCHEMA = vol.Schema(
 
 
 class KamstrupFlowHandler(ConfigFlow, domain=DOMAIN):
-    """Config flow for Kamstrup 403."""
+    """Config flow for Kamstrup 403 Kitsok Fork."""
 
     VERSION = 1
 
