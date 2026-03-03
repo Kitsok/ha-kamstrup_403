@@ -15,6 +15,7 @@ def test_init() -> None:
     assert kamstrup.url == "test_url"
     assert kamstrup.baudrate == 9600
     assert kamstrup.timeout == 1.0
+    assert kamstrup.serial_communication_logging is False
     assert kamstrup.reader is None
     assert kamstrup.writer is None
 
@@ -33,15 +34,26 @@ def test_crc_1021() -> None:
     assert Kamstrup._crc_1021((0xFF,)) == 255  # pylint: disable=protected-access
 
 
-def test_debug(caplog: pytest.LogCaptureFixture) -> None:
-    """Test debug logging."""
+def test_serial_logging_enabled(caplog: pytest.LogCaptureFixture) -> None:
+    """Test serial communication logging when enabled."""
     with patch("serial.serial_for_url"):
-        kamstrup = Kamstrup("test_url", 9600, 1.0)
+        kamstrup = Kamstrup("test_url", 9600, 1.0, serial_communication_logging=True)
 
     with caplog.at_level("DEBUG"):
-        kamstrup._debug("Test message", bytearray([0x01, 0x02, 0xFF]))  # pylint: disable=protected-access
+        kamstrup._log_serial(">>>>", bytearray([0x01, 0x02, 0xFF]))  # pylint: disable=protected-access
 
-    assert "Test message: 01 02 ff" in caplog.text
+    assert ">>>> 01 02 ff" in caplog.text
+
+
+def test_serial_logging_disabled(caplog: pytest.LogCaptureFixture) -> None:
+    """Test serial communication logging when disabled."""
+    with patch("serial.serial_for_url"):
+        kamstrup = Kamstrup("test_url", 9600, 1.0, serial_communication_logging=False)
+
+    with caplog.at_level("DEBUG"):
+        kamstrup._log_serial("<<<<", bytearray([0x01, 0x02, 0xFF]))  # pylint: disable=protected-access
+
+    assert "<<<< 01 02 ff" not in caplog.text
 
 
 async def test_connect() -> None:

@@ -12,7 +12,7 @@ from homeassistant.const import CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT, Pla
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
-from .const import CONF_DEBUG, DEFAULT_BAUDRATE, DEFAULT_SCAN_INTERVAL, DEFAULT_TIMEOUT, DOMAIN
+from .const import CONF_DEBUG, CONF_SERIAL_COMMUNICATION_LOGGING, DEFAULT_BAUDRATE, DEFAULT_SCAN_INTERVAL, DEFAULT_TIMEOUT, DOMAIN
 from .coordinator import KamstrupUpdateCoordinator
 from .pykamstrup.kamstrup import Kamstrup
 
@@ -40,6 +40,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry[Kamst
     scan_interval = timedelta(seconds=scan_interval_seconds)
     timeout_seconds = config_entry.options.get(CONF_TIMEOUT, DEFAULT_TIMEOUT)
     debug_enabled = config_entry.options.get(CONF_DEBUG, False)
+    serial_communication_logging = config_entry.options.get(CONF_SERIAL_COMMUNICATION_LOGGING, False)
 
     _set_debug_logging(debug_enabled)
 
@@ -55,7 +56,12 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry[Kamst
     )
 
     try:
-        client = Kamstrup(url=port, baudrate=DEFAULT_BAUDRATE, timeout=timeout_seconds)
+        client = Kamstrup(
+            url=port,
+            baudrate=DEFAULT_BAUDRATE,
+            timeout=timeout_seconds,
+            serial_communication_logging=serial_communication_logging,
+        )
         await client.connect()
     except Exception as exception:
         _LOGGER.warning("Can't establish a connection to %s", port)

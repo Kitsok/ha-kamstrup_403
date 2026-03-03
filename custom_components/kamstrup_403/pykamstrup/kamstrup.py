@@ -25,11 +25,12 @@ class Kamstrup:
     reader: asyncio.StreamReader | None
     writer: asyncio.StreamWriter | None
 
-    def __init__(self, url: str, baudrate: int, timeout: float) -> None:
+    def __init__(self, url: str, baudrate: int, timeout: float, serial_communication_logging: bool = False) -> None:
         """Initialize."""
         self.url = url
         self.baudrate = baudrate
         self.timeout = timeout
+        self.serial_communication_logging = serial_communication_logging
         self.reader = None
         self.writer = None
 
@@ -63,12 +64,17 @@ class Kamstrup:
                     reg ^= poly
         return reg
 
-    def _debug(self, msg: str, byte_array: bytearray) -> None:
-        """Log a debug message with a byte array."""
-        log = f"{msg}:"
-        for byte in byte_array:
-            log += f" {byte:02x}"
-        _LOGGER.debug(log)
+    def _log_serial(self, direction: str, byte_array: bytearray) -> None:
+        """Log serial communication bytes if enabled.
+
+        direction:
+        - >>>> : bytes sent to the meter.
+        - <<<< : bytes received from the meter.
+        """
+        if not self.serial_communication_logging:
+            return
+        payload = " ".join(f"{byte:02x}" for byte in byte_array)
+        _LOGGER.debug("%s %s", direction, payload)
 
     async def _ensure_connected(self) -> None:
         """Make sure the connection is established."""
@@ -81,9 +87,7 @@ class Kamstrup:
         if self.writer is None:
             msg = "Writer not available"
             raise RuntimeError(msg)
-        bytearray_data = bytearray(data)
-        self._debug("Write", bytearray_data)
-        self.writer.write(bytearray_data)
+        self.writer.write(bytearray(data))
         await self.writer.drain()
 
     async def _read(self) -> int | None:
@@ -97,9 +101,7 @@ class Kamstrup:
             if len(data) == 0:
                 _LOGGER.debug("Rx Timeout")
                 return None
-            bytearray_data = bytearray(data)
-            self._debug("Read", bytearray(bytearray_data))
-            return bytearray_data[0]
+            return data[0]
         except TimeoutError:
             _LOGGER.debug("Rx Timeout")
             return None
@@ -121,6 +123,7 @@ class Kamstrup:
             else:
                 send_data.append(i)
         send_data.append(0x0D)
+        self._log_serial(">>>>", bytearray(send_data))
         await self._write(tuple(send_data))
 
     async def _receive(self) -> bytearray | None:
@@ -140,6 +143,9 @@ class Kamstrup:
                 bytearray_data.append(data)
                 if data == resp_end:
                     break
+        if bytearray_data is None:
+            return None
+        self._log_serial("<<<<", bytearray_data)
 
         escape_byte = 0x1B
         response_data = bytearray()

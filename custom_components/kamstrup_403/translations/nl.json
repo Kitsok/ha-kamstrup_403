@@ -19,7 +19,8 @@
         "data": {
           "scan_interval": "Scaninterval (seconden)",
           "timeout": "Time-out voor serieel lezen (seconden)",
-          "debug": "Debug logging inschakelen"
+          "debug": "Debug logging inschakelen",
+          "serial_communication_logging": "Seriele communicatie loggen (>>>>/<<<<)"
         }
       }
     }
