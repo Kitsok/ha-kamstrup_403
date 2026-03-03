@@ -8,7 +8,7 @@ import logging
 from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.const import CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT, Platform
+from homeassistant.const import CONF_BAUDRATE, CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
@@ -39,6 +39,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry[Kamst
     scan_interval_seconds = config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
     scan_interval = timedelta(seconds=scan_interval_seconds)
     timeout_seconds = config_entry.options.get(CONF_TIMEOUT, DEFAULT_TIMEOUT)
+    baudrate = config_entry.options.get(CONF_BAUDRATE, DEFAULT_BAUDRATE)
     debug_enabled = config_entry.options.get(CONF_DEBUG, False)
     serial_communication_logging = config_entry.options.get(CONF_SERIAL_COMMUNICATION_LOGGING, False)
 
@@ -49,16 +50,17 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry[Kamst
         raise ValueError(msg)
 
     _LOGGER.debug(
-        "Set up entry, with scan_interval of %s seconds and timeout of %s seconds (debug=%s)",
+        "Set up entry, with scan_interval %s, timeout %s, baudrate %s (debug=%s)",
         scan_interval_seconds,
         timeout_seconds,
+        baudrate,
         debug_enabled,
     )
 
     try:
         client = Kamstrup(
             url=port,
-            baudrate=DEFAULT_BAUDRATE,
+            baudrate=baudrate,
             timeout=timeout_seconds,
             serial_communication_logging=serial_communication_logging,
         )

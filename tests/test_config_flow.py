@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 from homeassistant.config_entries import SOURCE_USER
-from homeassistant.const import CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT
+from homeassistant.const import CONF_BAUDRATE, CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 
@@ -16,6 +16,7 @@ from . import get_mock_config_data, setup_integration, unload_integration
 MOCK_UPDATE_CONFIG = {
     CONF_SCAN_INTERVAL: 120,
     CONF_TIMEOUT: 1.0,
+    CONF_BAUDRATE: 2400,
     CONF_DEBUG: True,
     CONF_SERIAL_COMMUNICATION_LOGGING: True,
 }

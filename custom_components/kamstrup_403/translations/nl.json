@@ -19,6 +19,7 @@
         "data": {
           "scan_interval": "Scaninterval (seconden)",
           "timeout": "Time-out voor serieel lezen (seconden)",
+          "baudrate": "Seriele baudrate (bps)",
           "debug": "Debug logging inschakelen",
           "serial_communication_logging": "Seriele communicatie loggen (>>>>/<<<<)"
         }

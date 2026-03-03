@@ -1,10 +1,10 @@
 """Test setup."""
 
 import logging
-from unittest.mock import Mock, call, patch
+from unittest.mock import AsyncMock, Mock, call, patch
 
 import pytest
-from homeassistant.const import CONF_PORT
+from homeassistant.const import CONF_BAUDRATE, CONF_PORT
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -89,3 +89,36 @@ async def test_setup_entry_enables_debug_logging(hass: HomeAssistant) -> None:
     ]
     integration_logger.setLevel.assert_called_once_with(logging.DEBUG)
     pykamstrup_logger.setLevel.assert_called_once_with(logging.DEBUG)
+
+
+async def test_setup_entry_uses_configured_baudrate(hass: HomeAssistant) -> None:
+    """Test setup entry applies configured baudrate."""
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        entry_id="test_entry_baudrate",
+        data={CONF_PORT: "/dev/ttyUSB0"},
+        options={CONF_BAUDRATE: 2400},
+    )
+    config_entry.add_to_hass(hass)
+
+    mock_client = AsyncMock()
+    mock_client.get_values.return_value = {
+        60: (1234.0, "GJ"),
+        68: (5678.0, "m³"),
+        80: (100.0, "kW"),
+        99: (0, None),
+        113: (1, None),
+        1001: (12345678, None),
+        1004: (12345.0, "h"),
+    }
+
+    with patch("custom_components.kamstrup_403.Kamstrup", return_value=mock_client) as mock_kamstrup:
+        assert await hass.config_entries.async_setup(config_entry.entry_id)
+        await hass.async_block_till_done()
+
+    mock_kamstrup.assert_called_once_with(
+        url="/dev/ttyUSB0",
+        baudrate=2400,
+        timeout=1.0,
+        serial_communication_logging=False,
+    )

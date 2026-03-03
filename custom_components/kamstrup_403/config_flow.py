@@ -4,7 +4,7 @@ from typing import Any
 
 import voluptuous as vol
 from homeassistant.config_entries import SOURCE_RECONFIGURE, ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
-from homeassistant.const import CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT
+from homeassistant.const import CONF_BAUDRATE, CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT
 from homeassistant.core import callback
 from homeassistant.helpers.selector import TextSelector, TextSelectorConfig, TextSelectorType
 
@@ -83,6 +83,10 @@ class KamstrupOptionsFlowHandler(OptionsFlow):
                         CONF_TIMEOUT,
                         default=self.config_entry.options.get(CONF_TIMEOUT, DEFAULT_TIMEOUT),
                     ): vol.All(vol.Coerce(float), vol.Range(min=0.0, max=5.0)),
+                    vol.Required(
+                        CONF_BAUDRATE,
+                        default=self.config_entry.options.get(CONF_BAUDRATE, DEFAULT_BAUDRATE),
+                    ): vol.All(vol.Coerce(int), vol.Range(min=300, max=115200)),
                     vol.Required(
                         CONF_DEBUG,
                         default=self.config_entry.options.get(CONF_DEBUG, False),
