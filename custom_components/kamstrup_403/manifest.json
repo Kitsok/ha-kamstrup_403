@@ -8,5 +8,5 @@
   "issue_tracker": "https://github.com/golles/ha-kamstrup_403/issues",
   "loggers": ["custom_components.kamstrup_403"],
   "requirements": ["pyserial-asyncio-fast==0.16"],
-  "version": "0.0.2"
+  "version": "0.0.3"
 }
