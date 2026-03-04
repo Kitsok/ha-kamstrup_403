@@ -1,7 +1,7 @@
 """Tests for Kamstrup class."""
 
 import math
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
@@ -273,6 +273,8 @@ async def test_read_asyncio_timeout_error() -> None:
 async def test_send_without_escapes() -> None:
     """Test sending data without escape characters."""
     mock_writer = AsyncMock()
+    serial_port = Mock()
+    mock_writer.transport = Mock(serial=serial_port)
 
     kamstrup = Kamstrup("test_url", 9600, 1.0)
     kamstrup.writer = mock_writer
@@ -280,11 +282,14 @@ async def test_send_without_escapes() -> None:
 
     message = (0x3F, 0x10, 0x01)
 
-    await kamstrup._send(0x80, message)  # pylint: disable=protected-access
+    with patch("custom_components.kamstrup_403.pykamstrup.kamstrup.asyncio.sleep", new=AsyncMock()):
+        await kamstrup._send(0x80, message)  # pylint: disable=protected-access
 
     # Verify the call was made (exact bytes depend on CRC calculation)
-    mock_writer.write.assert_called_once()
-    written_data = mock_writer.write.call_args[0][0]
+    assert mock_writer.write.call_count == 2
+    assert mock_writer.write.call_args_list[0].args[0] == b"/#1"
+    written_data = mock_writer.write.call_args_list[1].args[0]
+    assert serial_port.baudrate == 9600
 
     # Should start with prefix and end with 0x0D
     assert written_data[0] == 0x80
@@ -294,6 +299,8 @@ async def test_send_without_escapes() -> None:
 async def test_send_with_escapes() -> None:
     """Test sending data with escape characters."""
     mock_writer = AsyncMock()
+    serial_port = Mock()
+    mock_writer.transport = Mock(serial=serial_port)
 
     kamstrup = Kamstrup("test_url", 9600, 1.0)
     kamstrup.writer = mock_writer
@@ -302,10 +309,13 @@ async def test_send_with_escapes() -> None:
     # Use a message that will contain escape characters after CRC
     message = (0x40, 0x1B, 0x06)  # All escape characters
 
-    await kamstrup._send(0x80, message)  # pylint: disable=protected-access
+    with patch("custom_components.kamstrup_403.pykamstrup.kamstrup.asyncio.sleep", new=AsyncMock()):
+        await kamstrup._send(0x80, message)  # pylint: disable=protected-access
 
-    mock_writer.write.assert_called_once()
-    written_data = mock_writer.write.call_args[0][0]
+    assert mock_writer.write.call_count == 2
+    assert mock_writer.write.call_args_list[0].args[0] == b"/#1"
+    written_data = mock_writer.write.call_args_list[1].args[0]
+    assert serial_port.baudrate == 9600
 
     # Should contain escape sequences
     assert 0x1B in written_data  # Escape byte should be present

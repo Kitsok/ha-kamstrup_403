@@ -17,6 +17,9 @@ from .const import ESCAPES, UNITS
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 MULTIPLE_NBR_MAX: int = 8
+PREPARE_BAUDRATE: int = 300
+PREPARE_COMMAND: bytes = "/#1".encode("utf-8")
+PREPARE_DELAY_SECONDS: float = 1.0
 
 
 class Kamstrup:
@@ -88,6 +91,47 @@ class Kamstrup:
         payload = " ".join(f"{byte:02x}" for byte in byte_array)
         _LOGGER.debug("%s %s", direction, payload)
 
+    def _set_serial_baudrate(self, baudrate: int) -> None:
+        """Set baudrate on the current serial transport if available."""
+        if self.writer is None:
+            return
+
+        serial_port = None
+        transport = getattr(self.writer, "transport", None) or getattr(self.writer, "_transport", None)
+        if transport is not None:
+            serial_port = getattr(transport, "serial", None)
+
+        if serial_port is None:
+            get_extra_info = getattr(self.writer, "get_extra_info", None)
+            if callable(get_extra_info):
+                serial_port = get_extra_info("serial")
+
+        if serial_port is not None and hasattr(serial_port, "baudrate"):
+            serial_port.baudrate = baudrate
+        else:
+            _LOGGER.debug("Unable to set serial baudrate to %s on active writer", baudrate)
+
+    async def _prepare_transaction(self) -> None:
+        """Prepare meter communication before each transaction.
+
+        Sequence:
+        1. Switch serial speed to 300 baud.
+        2. Send '/#1' wake-up command.
+        3. Wait 1 second.
+        4. Switch back to configured baudrate.
+        """
+        await self._ensure_connected()
+        if self.writer is None:
+            msg = "Writer not available"
+            raise RuntimeError(msg)
+
+        self._set_serial_baudrate(PREPARE_BAUDRATE)
+        self.writer.write(PREPARE_COMMAND)
+        self._log_serial(">>>>", bytearray(PREPARE_COMMAND))
+        await self.writer.drain()
+        await asyncio.sleep(PREPARE_DELAY_SECONDS)
+        self._set_serial_baudrate(self.baudrate)
+
     async def _ensure_connected(self) -> None:
         """Make sure the connection is established."""
         if self.reader is None or self.writer is None:
@@ -120,6 +164,8 @@ class Kamstrup:
 
     async def _send(self, pfx: int, message: tuple[int, ...]) -> None:
         """Construct the message and send to the meter."""
+        await self._prepare_transaction()
+
         bytearray_data = bytearray(message)
         bytearray_data.append(0)
         bytearray_data.append(0)
