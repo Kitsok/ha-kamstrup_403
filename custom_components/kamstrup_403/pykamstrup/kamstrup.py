@@ -107,6 +107,7 @@ class Kamstrup:
                 serial_port = get_extra_info("serial")
 
         if serial_port is not None and hasattr(serial_port, "baudrate"):
+            _LOGGER.debug("Set serial baudrate to %s", baudrate)
             serial_port.baudrate = baudrate
         else:
             _LOGGER.debug("Unable to set serial baudrate to %s on active writer", baudrate)
